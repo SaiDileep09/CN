@@ -1,0 +1,125 @@
+Character stuffing
+------------------
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void characterStuffing(void);
+
+void main() {
+    int choice;
+    
+    while(1) {
+        printf("\n\n1. Character stuffing");
+        printf("\n2. Exit");
+        printf("\n\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch(choice) {
+            case 1:
+                characterStuffing();
+                break;
+            case 2:
+                exit(0);
+            default:
+                printf("\nInvalid option... Please re-enter.\n");
+        }
+    }
+}
+
+void characterStuffing(void) {
+    char c[50], d[100]; // Increased size of d to accommodate stuffed characters
+    int n, i, j;
+    
+    printf("\nEnter the number of characters: ");
+    scanf("%d", &n);
+    
+    printf("\nEnter the characters: ");
+    fflush(stdin); // Clear stdin buffer
+    for(i = 0; i < n; i++) {
+        scanf(" %c", &c[i]); // Read characters (ignoring whitespace)
+    }
+    c[n] = '\0'; // Null-terminate the string
+    
+    printf("\nOriginal data: ");
+    printf("%s", c);
+    
+    j = 0;
+    d[j++] = 'd';
+    d[j++] = 'l';
+    d[j++] = 'e';
+    d[j++] = 's';
+    d[j++] = 't';
+    d[j++] = 'x';
+    
+    for(i = 0; i < n; i++) {
+        if(c[i] == 'd' && c[i+1] == 'l' && c[i+2] == 'e') {
+            d[j++] = 'd';
+            d[j++] = 'l';
+            d[j++] = 'e';
+            i += 2; // Skip the next two characters in c[]
+        }
+        d[j++] = c[i];
+    }
+    
+    d[j++] = 'd';
+    d[j++] = 'l';
+    d[j++] = 'e';
+    d[j++] = 'e';
+    d[j++] = 't';
+    d[j++] = 'x';
+    d[j] = '\0'; // Null-terminate the string
+    
+    printf("\n\nTransmitted data: \n");
+    printf("%s", d);
+    
+    printf("\n\nReceived data: ");
+    
+    j = 0;
+    for(i = 6; d[i] != '\0'; i++) {
+        if(d[i] == 'd' && d[i+1] == 'l' && d[i+2] == 'e' && d[i+3] == 'd' && d[i+4] == 'l' && d[i+5] == 'e') {
+            i += 3; // Skip the next three characters in d[]
+        }
+        printf("%c", d[i]);
+    }
+}
+
+Output
+------
+1. Character stuffing
+2. Exit
+
+Enter choice: 1
+
+Enter the number of characters: 3
+
+Enter the characters: hrx
+
+Original data: hrx
+
+Transmitted data:
+dlestxhrxdleetx
+
+Received data: hrxdleetx
+
+1. Character stuffing
+2. Exit
+
+Enter choice: 1
+
+Enter the number of characters: 2
+
+Enter the characters: sd
+
+Original data: sd
+
+Transmitted data:
+dlestxsddleetx
+
+Received data: sddleetx
+
+1. Character stuffing
+2. Exit
+
+Enter choice: 2
+-----------------------------
