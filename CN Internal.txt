@@ -1,0 +1,267 @@
+1. Bit stuffing
+---------------
+
+#include <stdio.h>
+
+void main()
+{
+    int a[20], b[30];
+    int i, j, count, n;
+
+    printf("Enter frame length: ");
+    scanf("%d", &n);
+
+    printf("Enter input frame (0's & 1's only): ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    i = 0;
+    j = 0;
+
+    while (i < n)
+    {
+        b[j++] = a[i]; // Copy current bit to stuffed frame
+
+        if (a[i] == 1)
+        {
+            count = 1;
+            while (a[i+1] == 1 && i+1 < n && count < 5)
+            {
+                b[j++] = a[++i]; // Copy consecutive '1's
+                count++;
+                if (count == 5)
+                    b[j++] = 0; // Stuff '0' after five consecutive '1's
+            }
+        }
+        i++; // Move to the next bit
+    }
+
+    printf("After stuffing the frame is: ");
+    for (i = 0; i < j; i++)
+        printf("%d", b[i]);
+
+    printf("\n");
+}
+
+Output
+------
+Enter frame length: 5
+Enter input frame (0's & 1's only): 1
+1
+1
+1
+1
+After stuffing the frame is: 111110
+
+
+2. Character stuffing
+---------------------
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void characterStuffing(void);
+
+void main() {
+    int choice;
+    
+    while(1) {
+        printf("\n\n1. Character stuffing");
+        printf("\n2. Exit");
+        printf("\n\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch(choice) {
+            case 1:
+                characterStuffing();
+                break;
+            case 2:
+                exit(0);
+            default:
+                printf("\nInvalid option... Please re-enter.\n");
+        }
+    }
+}
+
+void characterStuffing(void) {
+    char c[50], d[100]; // Increased size of d to accommodate stuffed characters
+    int n, i, j;
+    
+    printf("\nEnter the number of characters: ");
+    scanf("%d", &n);
+    
+    printf("\nEnter the characters: ");
+    fflush(stdin); // Clear stdin buffer
+    for(i = 0; i < n; i++) {
+        scanf(" %c", &c[i]); // Read characters (ignoring whitespace)
+    }
+    c[n] = '\0'; // Null-terminate the string
+    
+    printf("\nOriginal data: ");
+    printf("%s", c);
+    
+    j = 0;
+    d[j++] = 'd';
+    d[j++] = 'l';
+    d[j++] = 'e';
+    d[j++] = 's';
+    d[j++] = 't';
+    d[j++] = 'x';
+    
+    for(i = 0; i < n; i++) {
+        if(c[i] == 'd' && c[i+1] == 'l' && c[i+2] == 'e') {
+            d[j++] = 'd';
+            d[j++] = 'l';
+            d[j++] = 'e';
+            i += 2; // Skip the next two characters in c[]
+        }
+        d[j++] = c[i];
+    }
+    
+    d[j++] = 'd';
+    d[j++] = 'l';
+    d[j++] = 'e';
+    d[j++] = 'e';
+    d[j++] = 't';
+    d[j++] = 'x';
+    d[j] = '\0'; // Null-terminate the string
+    
+    printf("\n\nTransmitted data: \n");
+    printf("%s", d);
+    
+    printf("\n\nReceived data: ");
+    
+    j = 0;
+    for(i = 6; d[i] != '\0'; i++) {
+        if(d[i] == 'd' && d[i+1] == 'l' && d[i+2] == 'e' && d[i+3] == 'd' && d[i+4] == 'l' && d[i+5] == 'e') {
+            i += 3; // Skip the next three characters in d[]
+        }
+        printf("%c", d[i]);
+    }
+}
+
+Output
+------
+1. Character stuffing
+2. Exit
+
+Enter choice: 1
+
+Enter the number of characters: 3
+
+Enter the characters: hrx
+
+Original data: hrx
+
+Transmitted data:
+dlestxhrxdleetx
+
+Received data: hrxdleetx
+
+1. Character stuffing
+2. Exit
+
+Enter choice: 1
+
+Enter the number of characters: 2
+
+Enter the characters: sd
+
+Original data: sd
+
+Transmitted data:
+dlestxsddleetx
+
+Received data: sddleetx
+
+1. Character stuffing
+2. Exit
+
+Enter choice: 2
+-----------------------------
+
+
+3. CRC polynomial
+-----------------
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h> // Added for strlen
+
+#define N strlen(g)
+
+char t[128], cs[128], g[] = "100010000";
+int a, e, c;
+
+void xor() {
+    for(c = 1; c < N; c++) // Fixed the for loop
+        cs[c] = ((cs[c] == g[c]) ? '0' : '1');
+}
+
+void crc() {
+    for(e = 0; e <= a; e++) {
+        if(cs[0] == '1')
+            xor();
+        for(c = 0; c < N-1; c++)
+            cs[c] = cs[c+1];
+        cs[c] = t[e];
+    }
+}
+
+void main() {
+
+    printf("\nEnter data: ");
+    scanf("%s", t);
+
+    printf("\nGenerating polynomial is: %s", g);
+
+    a = strlen(t);
+    for(e = a; e < a + N - 1; e++)
+        t[e] = '0';
+
+    printf("\nModified data: %s", t);
+
+    crc();
+
+    printf("\nChecksum: %s", cs);
+
+    for(e = a; e < a + N - 1; e++)
+        t[e] = cs[e - a];
+
+    printf("\nFinal codeword: %s", t);
+
+    int testError;
+    printf("\nTest Error detection (0 for yes, 1 for no): ");
+    scanf("%d", &testError);
+
+    if(testError == 0) {
+        int errorPos;
+        printf("Enter position where error is to be inserted: ");
+        scanf("%d", &errorPos);
+
+        t[errorPos] = (t[errorPos] == '0') ? '1' : '0';
+        printf("Erroneous data: %s\n", t);
+    }
+
+    crc();
+
+    for(e = 0; e < N - 1 && cs[e] != '1'; e++);
+
+    if(e < N - 1)
+        printf("Error detected.\n");
+    else
+        printf("No error detected.\n");
+
+}
+
+Output
+------
+Enter data: 100100
+
+Generating polynomial is: 100010000
+Modified data: 10010000000000
+Checksum:
+Final codeword: 100100
+Test Error detection (0 for yes, 1 for no): 1
+Error detected.
+
