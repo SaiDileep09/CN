@@ -1,0 +1,83 @@
+CRC polynomial
+--------------
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h> // Added for strlen
+
+#define N strlen(g)
+
+char t[128], cs[128], g[] = "100010000";
+int a, e, c;
+
+void xor() {
+    for(c = 1; c < N; c++) // Fixed the for loop
+        cs[c] = ((cs[c] == g[c]) ? '0' : '1');
+}
+
+void crc() {
+    for(e = 0; e <= a; e++) {
+        if(cs[0] == '1')
+            xor();
+        for(c = 0; c < N-1; c++)
+            cs[c] = cs[c+1];
+        cs[c] = t[e];
+    }
+}
+
+void main() {
+
+    printf("\nEnter data: ");
+    scanf("%s", t);
+
+    printf("\nGenerating polynomial is: %s", g);
+
+    a = strlen(t);
+    for(e = a; e < a + N - 1; e++)
+        t[e] = '0';
+
+    printf("\nModified data: %s", t);
+
+    crc();
+
+    printf("\nChecksum: %s", cs);
+
+    for(e = a; e < a + N - 1; e++)
+        t[e] = cs[e - a];
+
+    printf("\nFinal codeword: %s", t);
+
+    int testError;
+    printf("\nTest Error detection (0 for yes, 1 for no): ");
+    scanf("%d", &testError);
+
+    if(testError == 0) {
+        int errorPos;
+        printf("Enter position where error is to be inserted: ");
+        scanf("%d", &errorPos);
+
+        t[errorPos] = (t[errorPos] == '0') ? '1' : '0';
+        printf("Erroneous data: %s\n", t);
+    }
+
+    crc();
+
+    for(e = 0; e < N - 1 && cs[e] != '1'; e++);
+
+    if(e < N - 1)
+        printf("Error detected.\n");
+    else
+        printf("No error detected.\n");
+
+}
+
+Output
+------
+Enter data: 100100
+
+Generating polynomial is: 100010000
+Modified data: 10010000000000
+Checksum:
+Final codeword: 100100
+Test Error detection (0 for yes, 1 for no): 1
+Error detected.
