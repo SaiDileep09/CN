@@ -1,0 +1,54 @@
+Bit stuffing
+------------
+
+#include <stdio.h>
+
+void main()
+{
+    int a[20], b[30];
+    int i, j, count, n;
+
+    printf("Enter frame length: ");
+    scanf("%d", &n);
+
+    printf("Enter input frame (0's & 1's only): ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    i = 0;
+    j = 0;
+
+    while (i < n)
+    {
+        b[j++] = a[i]; // Copy current bit to stuffed frame
+
+        if (a[i] == 1)
+        {
+            count = 1;
+            while (a[i+1] == 1 && i+1 < n && count < 5)
+            {
+                b[j++] = a[++i]; // Copy consecutive '1's
+                count++;
+                if (count == 5)
+                    b[j++] = 0; // Stuff '0' after five consecutive '1's
+            }
+        }
+        i++; // Move to the next bit
+    }
+
+    printf("After stuffing the frame is: ");
+    for (i = 0; i < j; i++)
+        printf("%d", b[i]);
+
+    printf("\n");
+}
+
+Output
+------
+Enter frame length: 5
+Enter input frame (0's & 1's only): 1
+1
+1
+1
+1
+After stuffing the frame is: 111110
